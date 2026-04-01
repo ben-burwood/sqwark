@@ -2,12 +2,14 @@ import os
 
 from robyn import Robyn
 
+from app.auth import CookieGetter, SessionAuthHandler
 from app.config import PORT
 from app.database import init_db
 from app.routes.api import register_api_routes
 from app.routes.web import register_web_routes
 
 app = Robyn(__file__)
+app.configure_authentication(SessionAuthHandler(token_getter=CookieGetter()))
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "static")
 

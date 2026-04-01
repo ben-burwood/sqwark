@@ -5,12 +5,63 @@ import json
 from robyn import Request, Response, Robyn
 from sqlalchemy import func, select
 
+from app.auth import create_session, delete_session
+from app.config import DASHBOARD_PASSWORD, DASHBOARD_USER
 from app.database import get_session
 from app.models import Feedback, Tag, feedback_tag
 
 
 def register_web_routes(app: Robyn):
-    @app.get("/web/feedback")
+    @app.post("/web/login")
+    async def login(request: Request) -> Response:
+        try:
+            body = json.loads(request.body)
+        except (json.JSONDecodeError, TypeError):
+            return Response(
+                status_code=400,
+                headers={"content-type": "application/json"},
+                description='{"error": "Invalid JSON body"}',
+            )
+
+        username = body.get("username", "")
+        password = body.get("password", "")
+
+        if username != DASHBOARD_USER or password != DASHBOARD_PASSWORD:
+            return Response(
+                status_code=401,
+                headers={"content-type": "application/json"},
+                description='{"error": "Invalid credentials"}',
+            )
+
+        token = create_session()
+        return Response(
+            status_code=200,
+            headers={
+                "content-type": "application/json",
+                "set-cookie": f"sqwark_session={token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400",
+            },
+            description='{"ok": true}',
+        )
+
+    @app.post("/web/logout")
+    async def logout(request: Request) -> Response:
+        cookie_header = request.headers.get("cookie", "")
+        for part in cookie_header.split(";"):
+            part = part.strip()
+            if part.startswith("sqwark_session="):
+                delete_session(part.split("=", 1)[1])
+                break
+
+        return Response(
+            status_code=200,
+            headers={
+                "content-type": "application/json",
+                "set-cookie": "sqwark_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
+            },
+            description='{"ok": true}',
+        )
+
+    @app.get("/web/feedback", auth_required=True)
     async def list_feedback(request: Request) -> Response:
         params = request.query_params
 
@@ -69,12 +120,10 @@ def register_web_routes(app: Robyn):
             description=json.dumps(result),
         )
 
-    @app.get("/web/feedback/export")
+    @app.get("/web/feedback/export", auth_required=True)
     async def export_feedback(request: Request) -> Response:
         with get_session() as session:
-            items = session.execute(
-                select(Feedback).order_by(Feedback.created_at.desc())
-            ).scalars().all()
+            items = session.execute(select(Feedback).order_by(Feedback.created_at.desc())).scalars().all()
 
             output = io.StringIO()
             writer = csv.writer(output)
@@ -91,7 +140,7 @@ def register_web_routes(app: Robyn):
             description=output.getvalue(),
         )
 
-    @app.get("/web/tags")
+    @app.get("/web/tags", auth_required=True)
     async def list_tags(request: Request) -> Response:
         with get_session() as session:
             rows = session.execute(
