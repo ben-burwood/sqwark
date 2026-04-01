@@ -14,7 +14,7 @@ SESSION_TTL = 86400  # 24 hours
 
 def require_api_key(request: Request) -> Response | None:
     """Check X-API-Key Header. Returns an error Response if invalid, None if OK."""
-    key = request.headers.get("x-api-key", "")
+    key = request.headers.get("x-api-key") or ""
     if key != API_KEY:
         return Response(
             status_code=401,
@@ -44,8 +44,10 @@ def delete_session(token: str) -> None:
 class CookieGetter:
     """Extract session token from sqwark_session cookie."""
 
+    scheme = "Cookie"
+
     def get_token(self, request: Request) -> str | None:
-        cookie_header = request.headers.get("cookie", "")
+        cookie_header = request.headers.get("cookie") or ""
         for part in cookie_header.split(";"):
             part = part.strip()
             if part.startswith("sqwark_session="):
@@ -65,4 +67,4 @@ class SessionAuthHandler(AuthenticationHandler):
             del _sessions[token]
             return None
 
-        return Identity(claims={"authenticated": True})
+        return Identity(claims={"authenticated": "true"})

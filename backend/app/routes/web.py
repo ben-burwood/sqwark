@@ -45,7 +45,7 @@ def register_web_routes(app: Robyn):
 
     @app.post("/web/logout")
     async def logout(request: Request) -> Response:
-        cookie_header = request.headers.get("cookie", "")
+        cookie_header = request.headers.get("cookie") or ""
         for part in cookie_header.split(";"):
             part = part.strip()
             if part.startswith("sqwark_session="):
