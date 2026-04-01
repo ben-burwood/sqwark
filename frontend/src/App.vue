@@ -2,7 +2,9 @@
     <div v-if="checking" class="min-h-screen bg-base-300 flex items-center justify-center">
         <span class="loading loading-spinner loading-md text-base-content/30"></span>
     </div>
+
     <LoginPage v-else-if="!authenticated" @authenticated="authenticated = true" />
+
     <div v-else class="min-h-screen bg-base-300">
         <div class="max-w-6xl mx-auto py-6 md:py-8">
             <header class="flex items-center justify-between mb-8 px-2">
