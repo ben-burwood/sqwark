@@ -1,5 +1,6 @@
 services:
   sqwark:
+    container_name: sqwark
     build: .
     ports:
       - "8080:8080"

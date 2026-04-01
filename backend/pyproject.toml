@@ -5,6 +5,7 @@ description = "Feedback Aggregator"
 requires-python = ">=3.13"
 dependencies = [
     "robyn>=0.82.0",
+    "slack-sdk>=3.0",
     "sqlalchemy>=2.0",
 ]
 

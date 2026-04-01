@@ -2,6 +2,7 @@ import json
 
 from robyn import Request, Response, Robyn
 
+from app.alerts import notify_new_feedback
 from app.auth import require_api_key
 from app.database import get_session
 from app.models import Feedback, Tag
@@ -55,10 +56,11 @@ def register_api_routes(app: Robyn):
             session.add(feedback)
             session.commit()
             session.refresh(feedback)
-            result = feedback.to_dict()
+
+        notify_new_feedback(feedback)
 
         return Response(
             status_code=201,
             headers={"content-type": "application/json"},
-            description=json.dumps(result),
+            description=json.dumps(feedback.to_dict()),
         )
