@@ -1,5 +1,8 @@
 <template>
-    <LoginPage v-if="!authenticated" @authenticated="authenticated = true" />
+    <div v-if="checking" class="min-h-screen bg-base-300 flex items-center justify-center">
+        <span class="loading loading-spinner loading-md text-base-content/30"></span>
+    </div>
+    <LoginPage v-else-if="!authenticated" @authenticated="authenticated = true" />
     <div v-else class="min-h-screen bg-base-300">
         <div class="max-w-6xl mx-auto py-6 md:py-8">
             <header class="flex items-center justify-between mb-8 px-2">
@@ -8,9 +11,7 @@
                 </div>
                 <div class="flex items-center gap-5">
                     <ExportButton />
-                    <button @click="logout" class="text-xs text-base-content/40 hover:text-base-content transition-colors cursor-pointer">
-                        Logout
-                    </button>
+                    <button @click="logout" class="btn btn-ghost btn-error btn-sm">Logout</button>
                     <ThemeToggle />
                 </div>
             </header>
@@ -27,6 +28,7 @@ import LoginPage from "./components/LoginPage.vue";
 import ThemeToggle from "./components/ThemeToggle.vue";
 
 const authenticated = ref(false);
+const checking = ref(true);
 
 async function checkAuth() {
     try {
@@ -34,6 +36,8 @@ async function checkAuth() {
         authenticated.value = res.ok;
     } catch {
         authenticated.value = false;
+    } finally {
+        checking.value = false;
     }
 }
 
