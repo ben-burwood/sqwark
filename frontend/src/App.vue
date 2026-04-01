@@ -6,7 +6,8 @@
     <div v-else class="min-h-screen bg-base-300">
         <div class="max-w-6xl mx-auto py-6 md:py-8">
             <header class="flex items-center justify-between mb-8 px-2">
-                <div>
+                <div class="flex items-center gap-2">
+                    <img src="/sqwark.svg" alt="Sqwark" class="w-8 h-8" />
                     <h1 class="text-2xl font-semibold">Sqwark</h1>
                 </div>
                 <div class="flex items-center gap-5">
