@@ -1,0 +1,12 @@
+services:
+  sqwark:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SQWARK_API_KEY=${SQWARK_API_KEY:-dev}
+    volumes:
+      - sqwark-data:/data
+
+volumes:
+  sqwark-data:

@@ -1,0 +1,32 @@
+import os
+
+from robyn import Robyn
+
+from app.config import PORT
+from app.database import init_db
+from app.routes.api import register_api_routes
+from app.routes.web import register_web_routes
+
+app = Robyn(__file__)
+
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "static")
+
+if os.path.isdir(STATIC_DIR):
+    app.serve_directory(
+        route="/",
+        directory_path=os.path.abspath(STATIC_DIR),
+        index_file="index.html",
+    )
+
+
+@app.startup_handler
+async def startup():
+    init_db()
+
+
+register_api_routes(app)
+register_web_routes(app)
+
+
+if __name__ == "__main__":
+    app.start(port=PORT, host="0.0.0.0")
