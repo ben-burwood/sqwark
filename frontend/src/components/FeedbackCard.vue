@@ -1,20 +1,18 @@
 <template>
-    <div class="card bg-base-100 shadow-sm">
-        <div class="card-body p-4">
-            <p class="text-base">{{ feedback.text }}</p>
-            <div class="flex flex-wrap items-center gap-2 mt-2">
-                <span
-                    v-for="tag in feedback.tags"
-                    :key="tag"
-                    class="badge badge-sm badge-outline cursor-pointer hover:badge-primary"
-                    @click="$emit('tagClick', tag)"
-                >
-                    {{ tag }}
-                </span>
-                <span class="text-xs text-base-content/50 ml-auto">
-                    {{ timeAgo(feedback.created_at) }}
-                </span>
-            </div>
+    <div class="rounded-lg border border-base-content/10 bg-base-200 p-4 hover:border-base-content/20 transition-colors">
+        <p class="text-sm leading-relaxed">{{ feedback.text }}</p>
+        <div class="flex flex-wrap items-center gap-1.5 mt-3">
+            <span
+                v-for="tag in feedback.tags"
+                :key="tag"
+                class="text-[11px] px-2 py-0.5 rounded bg-base-content/5 text-base-content/50 cursor-pointer hover:text-primary hover:bg-primary/10 transition-colors"
+                @click="$emit('tagClick', tag)"
+            >
+                {{ tag }}
+            </span>
+            <span class="text-[11px] text-base-content/30 ml-auto">
+                {{ timeAgo(feedback.created_at) }}
+            </span>
         </div>
     </div>
 </template>

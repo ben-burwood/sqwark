@@ -1,3 +1,5 @@
+import csv
+import io
 import json
 
 from robyn import Request, Response, Robyn
@@ -65,6 +67,28 @@ def register_web_routes(app: Robyn):
             status_code=200,
             headers={"content-type": "application/json"},
             description=json.dumps(result),
+        )
+
+    @app.get("/web/feedback/export")
+    async def export_feedback(request: Request) -> Response:
+        with get_session() as session:
+            items = session.execute(
+                select(Feedback).order_by(Feedback.created_at.desc())
+            ).scalars().all()
+
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["id", "text", "tags", "created_at"])
+            for f in items:
+                writer.writerow([f.id, f.text, ";".join(t.name for t in f.tags), f.created_at.isoformat()])
+
+        return Response(
+            status_code=200,
+            headers={
+                "content-type": "text/csv",
+                "content-disposition": "attachment; filename=sqwark-feedback.csv",
+            },
+            description=output.getvalue(),
         )
 
     @app.get("/web/tags")

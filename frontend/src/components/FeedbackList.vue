@@ -1,23 +1,35 @@
 <template>
     <div class="space-y-4">
-        <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            <SearchBar v-model="search" class="flex-1" />
-            <SortToggle v-model="sort" />
+        <div class="rounded-lg border border-base-content/10 bg-base-200 p-4">
+            <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <SearchBar v-model="search" class="flex-1 w-full" />
+                <SortToggle v-model="sort" />
+            </div>
+            <TagFilter v-if="allTags.length" :tags="allTags" :selected="selectedTags" @toggle="toggleTag" class="mt-3" />
         </div>
 
-        <TagFilter v-if="allTags.length" :tags="allTags" :selected="selectedTags" @toggle="toggleTag" />
-
-        <div v-if="loading" class="text-center py-8">
-            <span class="loading loading-spinner loading-lg"></span>
+        <div class="text-xs text-base-content/40 px-1">
+            <span>{{ total }} feedback{{ total !== 1 ? 's' : '' }}</span>
         </div>
 
-        <div v-else-if="items.length === 0" class="text-center py-8 text-base-content/50">No feedback found.</div>
+        <div v-if="loading" class="flex justify-center py-16">
+            <span class="loading loading-spinner loading-md text-base-content/30"></span>
+        </div>
 
-        <div v-else class="space-y-3">
+        <div v-else-if="items.length === 0" class="text-center py-16 text-sm text-base-content/30">
+            No feedback found.
+        </div>
+
+        <div v-else class="space-y-2">
             <FeedbackCard v-for="item in items" :key="item.id" :feedback="item" @tag-click="toggleTag" />
 
-            <div v-if="total > items.length" class="text-center pt-2">
-                <button class="btn btn-sm btn-ghost" @click="loadMore">Load more ({{ total - items.length }} remaining)</button>
+            <div v-if="total > items.length" class="text-center pt-4">
+                <button
+                    class="text-xs px-4 py-2 rounded-lg border border-base-content/10 text-base-content/50 hover:text-base-content hover:border-base-content/20 transition-colors cursor-pointer"
+                    @click="loadMore"
+                >
+                    Load more ({{ total - items.length }} remaining)
+                </button>
             </div>
         </div>
     </div>
