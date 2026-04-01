@@ -1,6 +1,6 @@
 import os
 
-from robyn import Robyn
+from robyn import Response, Robyn
 
 from app.auth import CookieGetter, SessionAuthHandler
 from app.config import PORT
@@ -28,6 +28,11 @@ async def startup():
 
 register_api_routes(app)
 register_web_routes(app)
+
+
+@app.get("/health")
+async def health():
+    return Response(status_code=200, headers={"content-type": "text/plain"}, description="ok")
 
 
 if __name__ == "__main__":
