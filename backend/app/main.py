@@ -6,6 +6,7 @@ from app.auth import CookieGetter, SessionAuthHandler
 from app.config import PORT
 from app.database import init_db
 from app.routes.api import register_api_routes
+from app.routes.auth import register_auth_routes
 from app.routes.web import register_web_routes
 
 app = Robyn(__file__)
@@ -27,6 +28,7 @@ async def startup():
 
 
 register_api_routes(app)
+register_auth_routes(app)
 register_web_routes(app)
 
 
