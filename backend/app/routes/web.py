@@ -68,6 +68,7 @@ def register_web_routes(app: Robyn):
         search = params.get("search", "").strip()
         sort = params.get("sort", "newest")
         tag_filter = params.get("tag", "")
+        archived = params.get("archived", "false")
 
         try:
             limit = int(params.get("limit", "100"))
@@ -80,6 +81,9 @@ def register_web_routes(app: Robyn):
 
         with get_session() as session:
             query = select(Feedback)
+
+            if archived != "true":
+                query = query.where(Feedback.is_archived == False)  # noqa: E712
 
             if search:
                 query = query.where(Feedback.text.ilike(f"%{search}%"))
@@ -120,6 +124,27 @@ def register_web_routes(app: Robyn):
             description=json.dumps(result),
         )
 
+    @app.patch("/web/feedback/:id/archive", auth_required=True)
+    async def archive_feedback(request: Request, id: str) -> Response:
+        with get_session() as session:
+            feedback = session.execute(select(Feedback).where(Feedback.id == id)).scalar_one_or_none()
+
+            if not feedback:
+                return Response(
+                    status_code=404,
+                    headers={"content-type": "application/json"},
+                    description='{"error": "Feedback not found"}',
+                )
+
+            feedback.is_archived = True
+            session.commit()
+
+        return Response(
+            status_code=200,
+            headers={"content-type": "application/json"},
+            description='{"ok": true}',
+        )
+
     @app.get("/web/feedback/export", auth_required=True)
     async def export_feedback(request: Request) -> Response:
         with get_session() as session:
@@ -127,9 +152,9 @@ def register_web_routes(app: Robyn):
 
             output = io.StringIO()
             writer = csv.writer(output)
-            writer.writerow(["id", "text", "tags", "created_at"])
+            writer.writerow(["id", "text", "tags", "created_at", "is_archived"])
             for f in items:
-                writer.writerow([f.id, f.text, ";".join(t.name for t in f.tags), f.created_at.isoformat()])
+                writer.writerow([f.id, f.text, ";".join(t.name for t in f.tags), f.created_at.isoformat(), f.is_archived])
 
         return Response(
             status_code=200,
@@ -146,6 +171,8 @@ def register_web_routes(app: Robyn):
             rows = session.execute(
                 select(Tag.name, func.count(feedback_tag.c.feedback_id).label("count"))
                 .join(feedback_tag, Tag.id == feedback_tag.c.tag_id)
+                .join(Feedback, Feedback.id == feedback_tag.c.feedback_id)
+                .where(Feedback.is_archived == False)  # noqa: E712
                 .group_by(Tag.id)
                 .order_by(func.count(feedback_tag.c.feedback_id).desc())
             ).all()

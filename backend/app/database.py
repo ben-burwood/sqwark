@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import DeclarativeBase, Session
 
 from app.config import DB_PATH
@@ -22,6 +22,13 @@ def init_db():
     from app.models import Feedback, Tag, feedback_tag  # noqa: F401
 
     Base.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        try:
+            session.execute(text("ALTER TABLE feedback ADD COLUMN is_archived BOOLEAN DEFAULT 0"))
+            session.commit()
+        except Exception:
+            session.rollback()
 
 
 def get_session() -> Session:

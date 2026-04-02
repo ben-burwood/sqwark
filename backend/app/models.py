@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -35,6 +35,7 @@ class Feedback(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid4()))
     text: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
     tags: Mapped[list[Tag]] = relationship(secondary=feedback_tag, lazy="selectin")
 
     def to_dict(self) -> dict:
@@ -43,4 +44,5 @@ class Feedback(Base):
             "text": self.text,
             "tags": [t.name for t in self.tags],
             "created_at": self.created_at.isoformat(),
+            "is_archived": self.is_archived,
         }

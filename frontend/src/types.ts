@@ -3,6 +3,7 @@ export interface Feedback {
   text: string;
   tags: string[];
   created_at: string;
+  is_archived: boolean;
 }
 
 export interface TagCount {

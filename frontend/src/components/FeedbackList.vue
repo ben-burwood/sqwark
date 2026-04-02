@@ -4,6 +4,10 @@
             <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                 <SearchBar v-model="search" class="flex-1 w-full" />
                 <SortToggle v-model="sort" />
+                <label class="flex items-center gap-1.5 text-xs text-base-content/50 cursor-pointer select-none whitespace-nowrap">
+                    <input type="checkbox" v-model="showArchived" class="checkbox checkbox-xs" />
+                    Show archived
+                </label>
             </div>
             <TagFilter v-if="allTags.length" :tags="allTags" :selected="selectedTags" @toggle="toggleTag" class="mt-3" />
         </div>
@@ -19,7 +23,7 @@
             <div v-else-if="items.length === 0" class="text-center py-16 text-sm text-base-content/30">No feedback found.</div>
 
             <div v-else class="space-y-2">
-                <FeedbackCard v-for="item in items" :key="item.id" :feedback="item" @tag-click="toggleTag" />
+                <FeedbackCard v-for="item in items" :key="item.id" :feedback="item" @tag-click="toggleTag" @archive="archiveItem" />
 
                 <div v-if="total > items.length" class="text-center pt-4">
                     <button
@@ -48,6 +52,7 @@ const selectedTags = ref<string[]>([]);
 const items = ref<Feedback[]>([]);
 const total = ref(0);
 const allTags = ref<TagCount[]>([]);
+const showArchived = ref(false);
 const loading = ref(true);
 
 const PAGE_SIZE = 50;
@@ -67,6 +72,7 @@ async function fetchFeedback(append = false) {
     if (search.value) url.searchParams.set("search", search.value);
     url.searchParams.set("sort", sort.value);
     if (selectedTags.value.length) url.searchParams.set("tag", selectedTags.value.join(","));
+    if (showArchived.value) url.searchParams.set("archived", "true");
     url.searchParams.set("limit", String(PAGE_SIZE));
     if (append) url.searchParams.set("offset", String(items.value.length));
 
@@ -92,7 +98,15 @@ async function fetchTags() {
     allTags.value = data.tags;
 }
 
-watch([search, sort, selectedTags], () => fetchFeedback(), { deep: true });
+async function archiveItem(id: string) {
+    if (!confirm("Are you sure you want to archive this feedback?")) return;
+
+    await fetch(`/web/feedback/${id}/archive`, { method: "PATCH" });
+    fetchFeedback();
+    fetchTags();
+}
+
+watch([search, sort, selectedTags, showArchived], () => fetchFeedback(), { deep: true });
 
 onMounted(() => {
     fetchFeedback();
