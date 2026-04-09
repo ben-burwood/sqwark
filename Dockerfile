@@ -30,7 +30,7 @@ COPY backend/app/ ./app/
 COPY --from=build-frontend /app/frontend/dist ./static/
 
 ENV PATH="/app/.venv/bin:$PATH"
-ENV SQWARK_DB_PATH=/data/sqwark.db
+ENV DB_PATH=/data/sqwark.db
 
 EXPOSE 8080
 VOLUME ["/data"]

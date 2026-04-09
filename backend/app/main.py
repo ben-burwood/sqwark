@@ -32,7 +32,7 @@ register_auth_routes(app)
 register_web_routes(app)
 
 
-@app.get("/health")
+@app.get("/health", const=True)
 async def health():
     return Response(status_code=200, headers={"content-type": "text/plain"}, description="ok")
 

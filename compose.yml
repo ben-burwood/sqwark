@@ -3,11 +3,11 @@ services:
     container_name: sqwark
     build: .
     ports:
-      - "8080:8080"
+      - 8080:8080
     environment:
       - SQWARK_API_KEY=${SQWARK_API_KEY:-dev}
-      - SQWARK_DASHBOARD_USER=${SQWARK_DASHBOARD_USER:-admin}
-      - SQWARK_DASHBOARD_PASSWORD=${SQWARK_DASHBOARD_PASSWORD:-admin}
+      - DASHBOARD_USER=${SQWARK_DASHBOARD_USER:-admin}
+      - DASHBOARD_PASSWORD=${SQWARK_DASHBOARD_PASSWORD:-admin}
     volumes:
       - sqwark-data:/data
 
