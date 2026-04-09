@@ -1,7 +1,7 @@
 import os
 
-PORT = int(os.environ.get("SQWARK_PORT", "8080"))
-DB_PATH = os.environ.get("SQWARK_DB_PATH", "sqwark.db")
+PORT = int(os.environ.get("PORT", "8080"))
+DB_PATH = os.environ.get("DB_PATH", "sqwark.db")
 
 API_KEY = os.environ.get("SQWARK_API_KEY")
 if not API_KEY:
@@ -9,7 +9,7 @@ if not API_KEY:
 
 SLACK_WEBHOOK_URL = os.environ.get("SQWARK_SLACK_WEBHOOK_URL", "")
 
-DASHBOARD_USER = os.environ.get("SQWARK_DASHBOARD_USER")
-DASHBOARD_PASSWORD = os.environ.get("SQWARK_DASHBOARD_PASSWORD")
+DASHBOARD_USER = os.environ.get("DASHBOARD_USER")
+DASHBOARD_PASSWORD = os.environ.get("DASHBOARD_PASSWORD")
 if not DASHBOARD_USER or not DASHBOARD_PASSWORD:
-    raise RuntimeError("SQWARK_DASHBOARD_USER and SQWARK_DASHBOARD_PASSWORD environment variables are required")
+    raise RuntimeError("DASHBOARD_USER and DASHBOARD_PASSWORD environment variables are required")
