@@ -5,7 +5,7 @@ from robyn import Request, Response
 from robyn.authentication import AuthenticationHandler
 from robyn.robyn import Identity
 
-from app.config import API_KEY
+from app.config import API_KEY, SESSION_COOKIE
 
 # In-memory session store: token -> expiry timestamp
 _sessions: dict[str, float] = {}
@@ -50,7 +50,7 @@ class CookieGetter:
         cookie_header = request.headers.get("cookie") or ""
         for part in cookie_header.split(";"):
             part = part.strip()
-            if part.startswith("sqwark_session="):
+            if part.startswith(f"{SESSION_COOKIE}="):
                 return part.split("=", 1)[1]
         return None
 

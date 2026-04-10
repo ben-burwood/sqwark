@@ -35,8 +35,8 @@ The Vite dev server on `:5173` proxies `/api` and `/web` to the backend on `:808
 | Variable         | Required | Default      | Description          |
 |------------------|----------|--------------|----------------------|
 | `SQWARK_API_KEY` | Yes      | —            | API key for POST     |
-| `SQWARK_DB_PATH` | No       | `sqwark.db`  | SQLite database path |
-| `SQWARK_PORT`    | No       | `8080`       | Server port          |
+| `DB_PATH` | No       | `sqwark.db`  | SQLite database path |
+| `PORT`    | No       | `8080`       | Server port          |
 
 ## API
 

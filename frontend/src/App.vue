@@ -42,7 +42,7 @@ const checking = ref(true);
 
 async function checkAuth() {
   try {
-    const res = await fetch("/web/tags");
+    const res = await fetch("/web/auth/status");
     authenticated.value = res.ok;
   } catch {
     authenticated.value = false;
@@ -52,7 +52,7 @@ async function checkAuth() {
 }
 
 async function logout() {
-  await fetch("/web/logout", { method: "POST" });
+  await fetch("/web/auth/logout", { method: "POST" });
   authenticated.value = false;
 }
 

@@ -56,7 +56,7 @@ async function login() {
   loading.value = true;
 
   try {
-    const res = await fetch("/web/login", {
+    const res = await fetch("/web/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
